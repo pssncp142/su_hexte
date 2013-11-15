@@ -1,8 +1,8 @@
 PRO main
 
-  rate=250.
-  dur=2.^15
-  dseg=2.^14
+  rate=1050.
+  dur=2.^14
+  dseg=2.^12
   dt=9.
 
   poissonlc,rate, dur, dt, lc

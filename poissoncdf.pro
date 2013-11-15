@@ -1,4 +1,24 @@
 PRO poissoncdf, var, range, cdf
+  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Yigit Dallilar          15.11.2013
+; 
+; Poisson CDF calculation
+; 
+; PURPOSE  
+;   - Sampling poisson light curves for background simulation
+;
+; INPUT 
+;   - var       variance of poisson distribution
+;   - range     last k point to calculate cdf
+;
+; OUTPUT
+;   - cdf       array of cdf function with array of length range+1
+;
+; NOTES
+;   - range+1 value is given as 1 
+;   - range should be given carefully according to variance
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,;;;
 
   var=double(var)
   coef=exp(-var)
@@ -16,3 +36,4 @@ PRO poissoncdf, var, range, cdf
   cdf[range]=1
 
 END
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
