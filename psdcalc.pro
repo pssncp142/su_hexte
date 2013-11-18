@@ -20,7 +20,6 @@ PRO psdcalc, seglc, dt, psd
 ;   - Leahy normalization is applied.
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
   
   shape=size(seglc)
   dtt=0.5^dt
@@ -35,6 +34,9 @@ PRO psdcalc, seglc, dt, psd
         psd=psd+float(psdt[1:-1])
      ENDELSE
   ENDFOR
-  
+
+  print, '----------------------------------'  
+  print, 'Leahy normalized PSD function...'
+
 END
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

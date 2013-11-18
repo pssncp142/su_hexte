@@ -41,7 +41,12 @@ PRO poissonlc, var, dur, dt, lc
      ENDFOR
   ENDFOR
  
-  plot,lc
+  print, '----------------------------------'
+  print, 'Poisson light curve is created...'
+  print, 'Variance :', float(var/dtt)
+  print, 'Duration :', float(dur), ' sec'
+  print, 'Time Res :', float(0.5^dt*1e3), ' milisec'
+  print, 'Rate     :', float(mean(lc)), ' cnt/sec'
 
 END
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
