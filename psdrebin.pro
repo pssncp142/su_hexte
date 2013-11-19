@@ -1,4 +1,4 @@
-PRO psdrebin, psd, dseg, dt, rbpsd
+PRO psdrebin, psd, dseg, dt, fbin, rbpsd
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Yigit Dallilar          15.11.2013
@@ -42,7 +42,7 @@ PRO psdrebin, psd, dseg, dt, rbpsd
   ENDFOR
 
   window,0
-  plot,fbin,rbpsd,psym=1,/xlog,yrange=[1.4,2.6]
+  plot,fbin,rbpsd,psym=1,/xlog,yrange=[1.8,2.2],xrange=[1e-2,3e3]
   print, '----------------------------------'
   print, 'PSD function is rebinned...'
   print, 'Log int      :', 0.1

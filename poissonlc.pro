@@ -9,9 +9,9 @@ PRO poissonlc, var, dur, dt, lc
 ;   - Sampling poisson light curves for background simulation
 ;
 ; INPUT 
-;   - var       variance of poisson distribution
+;   - var       variance of poisson distribution for one second
 ;   - dur       duration of the observation time in seconds
-;   - dt        0.5^dt time resolution of the curve
+;   - dt        time resolution of the curve in us
 ;
 ; OUTPUT
 ;   - lc        light curve array with range of dur*2^dt 
@@ -24,14 +24,15 @@ PRO poissonlc, var, dur, dt, lc
 ;   - poissoncdf.pro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   
-  dtt=0.5^dt
+  dtt=dt*1e-6
   steps=floor(dur/dtt)
-  var=var*dtt
-  poissoncdf, var, 200, cdf
+  vart=var*(dtt)
+  poissoncdf, vart, 200, cdf
   limit=n_elements(cdf)-1
   n_rand=randomu(systime(1),steps)
   lc=fltarr(steps)
-  
+  ;print,steps
+
   FOR i=0,steps-1 DO BEGIN
      FOR j=0, limit DO BEGIN
         IF n_rand[i] LT cdf[j] THEN BEGIN
@@ -41,12 +42,12 @@ PRO poissonlc, var, dur, dt, lc
      ENDFOR
   ENDFOR
  
-  print, '----------------------------------'
-  print, 'Poisson light curve is created...'
-  print, 'Variance :', float(var/dtt)
-  print, 'Duration :', float(dur), ' sec'
-  print, 'Time Res :', float(0.5^dt*1e3), ' milisec'
-  print, 'Rate     :', float(mean(lc)), ' cnt/sec'
+  ;print, '----------------------------------'
+  ;print, 'Poisson light curve is created...'
+  ;print, 'Variance :', float(var)
+  ;print, 'Duration :', float(dur), ' sec'
+  ;print, 'Time Res :', float(dt), ' usec'
+  ;print, 'Rate     :', float(mean(lc)), ' cnt/sec'
 
 END
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
