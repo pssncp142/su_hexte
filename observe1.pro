@@ -1,4 +1,4 @@
-PRO observe1, back_r, xuld_r, dur, dt, dead, olc 
+PRO observe1, back_r, xuld_r, dur, dt, dead, olc, perc 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Yigit Dallilar          18.11.2013
@@ -16,7 +16,9 @@ PRO observe1, back_r, xuld_r, dur, dt, dead, olc
 ;   - dead      deadtime in miliseconds
 ;
 ; OUTPUT
-;   - lc        light curve array with range of dur/(dt*1e-6) 
+;   - olc       light curve array with range of dur/(dt*1e-6) 
+;   - perc      percentage between observed light curve 
+;               and pure poisson light curve
 ;
 ; NOTES
 ;
@@ -24,20 +26,23 @@ PRO observe1, back_r, xuld_r, dur, dt, dead, olc
 ;   - poissonlc.pro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
 poissonlc,back_r,dur,dt,back_lc
 poissonlc,xuld_r,dur,dt,xuld_lc
+
 
 olc=back_lc
 
 tot_step=floor(dur/(dt*1e-6))
 dead_step=floor(dead*1e3/dt)
-;help,dead_step,tot_step
 
 FOR i=0,tot_step-1 DO BEGIN
    IF xuld_lc[i] GT 0 THEN BEGIN
       IF dead_step LT tot_step-i THEN BEGIN
          olc[i+1:i+dead_step]=0
          i=i+dead_step
+      ENDIF ELSE IF i EQ tot_step-1 THEN BEGIN
+         BREAK
       ENDIF ELSE BEGIN
          olc[i+1:tot_step-1]=0
          BREAK
@@ -45,7 +50,9 @@ FOR i=0,tot_step-1 DO BEGIN
    ENDIF
 ENDFOR
 
-print,float(mean(olc)/mean(back_lc))*100,'%'
+perc=mean(olc)/mean(back_lc)*100.
+
+;print,float(mean(olc)/mean(back_lc))*100,'%'
 
 END
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

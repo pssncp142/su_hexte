@@ -36,7 +36,7 @@ PRO poissonlc, var, dur, dt, lc
   FOR i=0,steps-1 DO BEGIN
      FOR j=0, limit DO BEGIN
         IF n_rand[i] LT cdf[j] THEN BEGIN
-           lc[i]=j/dtt
+           lc[i]=j
            BREAK
         ENDIF
      ENDFOR
