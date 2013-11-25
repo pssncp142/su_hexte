@@ -1,4 +1,4 @@
-PRO poissonlc, var, dur, dt, lc
+PRO poissonlc, var, dur, dt, lc, chatty=chatty
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Yigit Dallilar          15.11.2013
@@ -24,17 +24,18 @@ PRO poissonlc, var, dur, dt, lc
 ;   - poissoncdf.pro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   
+  IF keyword_set(chatty) THEN chatty=1 ELSE chatty=0
+
   dtt=dt*1e-6
   steps=floor(dur/dtt)
   vart=var*(dtt)
   poissoncdf, vart, 200, cdf
-  limit=n_elements(cdf)-1
+  limit=n_elements(cdf)
   n_rand=randomu(systime(1),steps)
   lc=fltarr(steps)
-  ;print,steps
 
   FOR i=0,steps-1 DO BEGIN
-     FOR j=0, limit DO BEGIN
+     FOR j=0, limit-1 DO BEGIN
         IF n_rand[i] LT cdf[j] THEN BEGIN
            lc[i]=j
            BREAK
@@ -42,12 +43,14 @@ PRO poissonlc, var, dur, dt, lc
      ENDFOR
   ENDFOR
  
-  ;print, '----------------------------------'
-  ;print, 'Poisson light curve is created...'
-  ;print, 'Variance :', float(var)
-  ;print, 'Duration :', float(dur), ' sec'
-  ;print, 'Time Res :', float(dt), ' usec'
-  ;print, 'Rate     :', float(mean(lc)), ' cnt/sec'
+  IF chatty EQ 1 THEN BEGIN
+     print, '----------------------------------'
+     print, 'Poisson light curve is created...'
+     print, 'Variance :', float(var)
+     print, 'Duration :', float(dur), ' sec'
+     print, 'Time Res :', float(dt), ' usec'
+     print, 'Rate     :', float(mean(lc)/dtt), ' cnt/sec'
+  ENDIF
 
 END
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

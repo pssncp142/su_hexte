@@ -4,7 +4,7 @@ PRO xulddist, pow, min_d, max_d, step, dist
 ; Yigit Dallilar          24.11.2013
 ; 
 ; Returns deadtime distribution function of cosmic background
-; events. Assuming events are dead time is distributed in logarithmic.
+; events. Dead time is distributed in logarithmic.
 ;
 ; PURPOSE
 ;   - Use the distribution function on the decision of the dead time
