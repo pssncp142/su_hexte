@@ -31,7 +31,7 @@ PRO observe1, back_r, xuld_r, dur, dt, olc, perc, $
 ;               and pure poisson light curve
 ;
 ; NOTES
-;   - NOT SURE IF POWER LAW WORKS
+;   - NOT SURE IF POWER LAW WORKS??
 ;
 ; PROCEDURES
 ;   - poissonlc.pro
@@ -118,6 +118,7 @@ ENDIF ELSE BEGIN
 
          IF dead_step LT tot_step-i THEN BEGIN
             olc[i+1:i+dead_step]=0
+            cnt=cnt+total(xuld_lc[i+1:i+dead_step])
             i=i+dead_step
          ENDIF ELSE IF i EQ tot_step-1 THEN BEGIN
             olc[i]=0
@@ -126,6 +127,7 @@ ENDIF ELSE BEGIN
             olc[i+1:tot_step-1]=0
             BREAK
          ENDELSE
+
       ENDIF
 
    ENDFOR   
