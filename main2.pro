@@ -14,7 +14,7 @@ res=fltarr(times2,2)
 
 FOR j=0,times2-1 DO BEGIN
    FOR i=0,times-1 DO BEGIN
-      observe1,back_r, xuld_r+j*step, dur, dt, dead, olc, perc 
+      observe1,back_r, xuld_r+j*step, dur, dt, olc, perc, dead=dead 
       tres[i]=perc
    ENDFOR 
    res[j,0]=mean(tres)

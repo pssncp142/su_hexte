@@ -23,11 +23,13 @@ PRO psdcalc, seglc, dt, psd
   
   shape=size(seglc)
   dtt=0.5^dt
-  FOR i=0,shape[1]-1 DO BEGIN
-     R=mean(seglc[i,*])/dtt
+  FOR i=0,shape[1]-2 DO BEGIN
+     R=mean(seglc[i,*])
+     print,R,total(seglc[i,*])
+     print,dtt,R,shape[1],shape[2]
      IF i EQ 0 THEN BEGIN
         psdt=fft(seglc[i,*])
-        psd=abs(psdt[1:-1])^2*shape[2]*(2./R)/shape[1]
+        psd=abs(psdt[0:-1])^2*(2./R*2^5.)
      ENDIF ELSE BEGIN
         psdt=fft(seglc[i,*])
         psdt[1:-1]=abs(psdt[1:-1])^2*shape[2]*(2./R)/shape[1]

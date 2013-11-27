@@ -32,6 +32,7 @@ PRO poissonlc, var, dur, dt, lc, chatty=chatty
   poissoncdf, vart, 200, cdf
   limit=n_elements(cdf)
   n_rand=randomu(systime(1),steps)
+  FOR i=0,steps-1 DO n_rand[i]=randomu(n_rand[i]*1e6)
   lc=fltarr(steps)
 
   FOR i=0,steps-1 DO BEGIN
