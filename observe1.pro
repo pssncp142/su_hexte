@@ -55,22 +55,26 @@ IF keyword_set(chatty) THEN chatty=1 ELSE chatty=0
 
 IF keyword_set(vndet) THEN BEGIN
 ndet=vndet-1
-print, 'Simulation will be performed for', uint(ndet+1),' detectors.'
+IF chatty EQ 1 THEN $
+   print, 'Simulation will be performed for', uint(ndet+1),' detectors.'
 ENDIF ELSE BEGIN
 ndet=0
-print, 'Simulation will be performed for a single detector' 
+IF chatty EQ 1 THEN $
+   print, 'Simulation will be performed for a single detector.' 
 ENDELSE
 
 IF keyword_set(pure) THEN BEGIN
    p_pure=1
-   IF chatty EQ 1 THEN print,'Pure poisson light curve'
+   IF chatty EQ 1 THEN print,'Pure poisson light curve.'
 ENDIF ELSE IF keyword_set(vdead) THEN BEGIN 
+   p_pure=0
    opt=1
    dead=vdead 
    IF chatty EQ 1 THEN print,'Constant deadtime option with',$
                              float(dead),' milisec'
 ENDIF ELSE IF keyword_set(vpow) AND keyword_set(vmin_d) AND $
    keyword_set(vmax_d) AND keyword_set(vstep) THEN BEGIN
+   p_pure=0
    opt=2
    pow=vpow
    min_d=vmin_d
@@ -87,7 +91,7 @@ ENDIF ELSE BEGIN
    message,'Choose whether constant or power law deadtime'
 ENDELSE
 
-FOR k=0,0 DO BEGIN
+FOR k=0,ndet DO BEGIN
    
    IF p_pure EQ 1 THEN BEGIN
       poissonlc,back_r,dur,dt,back_lc,chatty=chatty
@@ -178,13 +182,13 @@ FOR k=0,0 DO BEGIN
 
 ENDFOR
 
-perc=mean(olc)/mean(back_lc)*100.
+;perc=mean(olc)/mean(back_lc)*100.
 
-IF chatty EQ 1 THEN print,'Percentage left from original light curve :',$
-                          float(mean(olc)/mean(back_lc))*100,'%'
+;IF chatty EQ 1 THEN print,'Percentage left from original light curve :',$
+;                          float(mean(olc)/mean(back_lc))*100,'%'
 
-rebinlc, olc, dur, dt, f_dt, rblc
-psdcalc, rblc, f_dt, psd
+rebinlc, olc1, dur, dt, f_dt, rblc
+psdcalc, rblc, dur, psd
 
 END
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

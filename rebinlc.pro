@@ -1,7 +1,27 @@
 PRO rebinlc, lc, dur, dt, f_dt, rblc
+  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Yigit Dallilar           27.11.2013
+;
+; Rebins the light curve into discrete intervals with f_dt
+;
+; PURPOSE
+;  - Prepare the ligth curve for PSD calculation
+;
+; INPUT
+;  - lc      original light curve array
+;  - dur     duration of the ligth curve in seconds
+;  - dt      original discrete time interval in us
+;  - f_dt    discrete time interval using to rebin the light curve
+;
+; OUTPUT
+;  - rblc    rebinned light curve
+;
+; NOTES
+;  - Error of the light curve
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   nofbin=floor(dur/f_dt)
-  print,nofbin*f_dt/dt*1e6,size(lc)
   rblc=fltarr(2,nofbin)
   lc_size=size(lc)
   step=0
@@ -15,11 +35,10 @@ PRO rebinlc, lc, dur, dt, f_dt, rblc
      ENDIF ELSE BEGIN
         rblc[0,i]=total(lc[floor(step):floor(lst_step)])/f_dt
      ENDELSE
-     rblc[1,i]=rblc[0,i]; find error !!!!
+     rblc[1,i]=rblc[0,i]; find error!!!!
      step=lst_step
 
   ENDFOR
 
-  print,mean(rblc[0,*])
-
 END
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
