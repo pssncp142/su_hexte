@@ -1,4 +1,4 @@
-PRO poissonlc, var, dur, dt, lc, chatty=chatty
+PRO poissonlc, var, dur, dt, rand, lc, chatty=chatty
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Yigit Dallilar          15.11.2013
@@ -29,10 +29,12 @@ PRO poissonlc, var, dur, dt, lc, chatty=chatty
   dtt=dt*1e-6
   steps=floor(dur/dtt)
   vart=var*(dtt)
-  poissoncdf, vart, 200, cdf
+  poissoncdf, vart, 50, cdf
   limit=n_elements(cdf)
+  ;DefSysV, '!RNG', Obj_New('RandomNumberGenerator')
+  ;n_rand=fltarr(steps)
+  n_rand=rand->GetRandomNumbers(steps)
   n_rand=randomu(systime(1),steps)
-  ;FOR i=0,steps-1 DO n_rand[i]=randomu(n_rand[i]*1e6)
   lc=fltarr(steps)
 
   FOR i=0,steps-1 DO BEGIN

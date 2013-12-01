@@ -1,4 +1,4 @@
-PRO observe1, back_r, xuld_r, dur, dt, f_dt, rblc, psd, $
+PRO observe1, back_r, xuld_r, dur, dt, f_dt, rand, rblc, psd, $
               pure=pure,$
               dead=vdead,$
               pow=vpow,min_d=vmin_d,max_d=vmax_d,step=vstep,$
@@ -91,15 +91,17 @@ ENDIF ELSE BEGIN
    message,'Choose whether constant or power law deadtime'
 ENDELSE
 
+;DefSysV, '!RNG', Obj_New('RandomNumberGenerator')
+
 FOR k=0,ndet DO BEGIN
    
    IF p_pure EQ 1 THEN BEGIN
-      poissonlc,back_r,dur,dt,back_lc,chatty=chatty
+      poissonlc,back_r,dur,dt,rand,back_lc,chatty=chatty
       olc=back_lc
    ENDIF ELSE BEGIN
       ;create back_lc and xuld_lc
-      poissonlc,back_r,dur,dt,back_lc,chatty=chatty
-      poissonlc,xuld_r,dur,dt,xuld_lc,chatty=chatty
+      poissonlc,back_r,dur,dt,rand,back_lc,chatty=chatty
+      poissonlc,xuld_r,dur,dt,rand,xuld_lc,chatty=chatty
       olc=back_lc
    
       tot_step=floor(dur/(dt*1e-6))

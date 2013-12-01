@@ -36,9 +36,11 @@ PRO rebinlc, lc, dur, dt, f_dt, rblc
         rblc[0,i]=total(lc[floor(step):floor(lst_step)])/f_dt
      ENDELSE
      rblc[1,i]=rblc[0,i]; find error!!!!
-     step=lst_step
+     step=lst_step+1
 
   ENDFOR
+
+  ;print,mean(lc)/(8*1e-6),mean(rblc)
 
 END
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
