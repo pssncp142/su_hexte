@@ -5,9 +5,9 @@ xuld_r=100.
 dur=2.^5
 dt=8
 f_dt=0.5^9
-times=100
-ndet=2
-;pure=0
+times=200
+ndet=1
+;pure=1
 dead=2.5
 
 ;pow=-1.8
