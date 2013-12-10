@@ -41,7 +41,7 @@ PRO observe1, back_r, xuld_r, dur, dt, f_dt, rand, rblc, psd, $
 ;               and pure poisson light curve
 ;
 ; NOTES
-;   - NOT SURE IF POWER LAW WORKS??
+;   - ??
 ;
 ; PROCEDURES
 ;   - poissonlc.pro
@@ -183,11 +183,6 @@ FOR k=0,ndet DO BEGIN
    ENDELSE
 
 ENDFOR
-
-;perc=mean(olc)/mean(back_lc)*100.
-
-;IF chatty EQ 1 THEN print,'Percentage left from original light curve :',$
-;                          float(mean(olc)/mean(back_lc))*100,'%'
 
 rebinlc, olc1, dur, dt, f_dt, rblc
 psdcalc, rblc, dur, psd

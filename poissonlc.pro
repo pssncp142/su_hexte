@@ -12,6 +12,7 @@ PRO poissonlc, var, dur, dt, rand, lc, chatty=chatty
 ;   - var       variance of poisson distribution for one second
 ;   - dur       duration of the observation time in seconds
 ;   - dt        time resolution of the curve in us
+;   - rand      random number generator
 ;
 ; OUTPUT
 ;   - lc        light curve array with range of dur*2^dt 
@@ -31,20 +32,7 @@ PRO poissonlc, var, dur, dt, rand, lc, chatty=chatty
   vart=var*(dtt)
   poissoncdf, vart, 50, cdf
   limit=n_elements(cdf)
-  ;DefSysV, '!RNG', Obj_New('RandomNumberGenerator')
-  ;n_rand=fltarr(steps)
-  n_rand=rand->GetRandomNumbers(steps)
-  n_rand=randomu(systime(1),steps)
-  lc=fltarr(steps)
-
-  FOR i=0,steps-1 DO BEGIN
-     FOR j=0, limit-1 DO BEGIN
-        IF n_rand[i] LT cdf[j] THEN BEGIN
-           lc[i]=j
-           BREAK
-        ENDIF
-     ENDFOR
-  ENDFOR
+  lc=rand->GetRandomNumbers(steps,poisson=vart,/double)
  
   IF chatty EQ 1 THEN BEGIN
      print, '----------------------------------'
