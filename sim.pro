@@ -2,7 +2,7 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
          nsig, $
          pure=vpure,$
          dead=vdead,$
-         pow=vpow,min_d=vmin_d,max_d=vmax_d,step=vstep,$
+         pow=vpow,ratio=vratio,min_d=vmin_d,max_d=vmax_d,step=vstep,$
          ndet=vndet,$
          logf=vlogf, high=vhigh,$
          chatty=chatty 
@@ -74,8 +74,13 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
   IF keyword_set(vpow) THEN BEGIN
      pow=vpow 
      print,'Power law deadtime distribution'
-     print,'alpha  :',pow
+     print,'Dead^(-alpha)    :',pow
   ENDIF ELSE pow=0
+  IF keyword_set(vratio) THEN BEGIN
+     ratio=vratio
+     print,'2.5 const.       :',float((1-ratio)*xuld_r),' cts/s'
+     print,'Dist. counts     :',float(ratio*xuld_r),' cts/s'
+  ENDIF ELSE ratio=0
   IF keyword_set(vmin_d) THEN BEGIN
      min_d=vmin_d
      print,'Minimum deadtime :',min_d,' msec...'
@@ -102,14 +107,16 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
      observe1, back_r, xuld_r, dur, dt, f_dt, !RNG, rblc, psd, $
                pure=pure,$
                dead=dead,$
-               pow=pow,min_d=min_d,max_d=max_d,step=step,$
+               pow=pow,ratio=ratio,min_d=min_d,max_d=max_d,step=step,$
                ndet=ndet,$
                chatty=0
     
      IF i EQ 0 THEN BEGIN
         psd_t=psd
+        meanlc=mean(rblc)
      ENDIF ELSE BEGIN
         psd_t=(psd_t*i+psd)/(i+1)
+        meanlc=(meanlc*i+mean(rblc))/(i+1)
      ENDELSE
 
      progressbar,i,times,start,2L
@@ -119,6 +126,11 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
   psd_t=psd_t[1:floor(n_elements(psd)*0.5)+1]
   length=floor(n_elements(psd)*0.5)
   f=(findgen(length)+1)/(dur)
+
+  print,''
+  print,'Initial Rate : ',float(back_r),' cts/sec'
+  print,'Final Rate   : ',float(meanlc),' cts/sec'
+  print,'Efficiency   : ',float(meanlc/back_r*100),'%'
 
   freqrebin,f,psd_t,freq,psd,nsig,osig,logf=0.12,high=128D0
 

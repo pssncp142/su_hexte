@@ -1,7 +1,7 @@
 PRO observe1, back_r, xuld_r, dur, dt, f_dt, rand, rblc, psd, $
               pure=pure,$
               dead=vdead,$
-              pow=vpow,min_d=vmin_d,max_d=vmax_d,step=vstep,$
+              pow=vpow,ratio=vratio,min_d=vmin_d,max_d=vmax_d,step=vstep,$
               ndet=vndet,$
               chatty=chatty 
 
@@ -73,25 +73,27 @@ ENDIF ELSE IF keyword_set(vdead) THEN BEGIN
    IF chatty EQ 1 THEN print,'Constant deadtime option with',$
                              float(dead),' milisec'
 ENDIF ELSE IF keyword_set(vpow) AND keyword_set(vmin_d) AND $
-   keyword_set(vmax_d) AND keyword_set(vstep) THEN BEGIN
+   keyword_set(vmax_d) AND keyword_set(vstep) AND $
+   keyword_set(vratio) THEN BEGIN
    p_pure=0
    opt=2
    pow=vpow
+   ratio=vratio
    min_d=vmin_d
    max_d=vmax_d
    step=vstep
    IF chatty EQ 1 THEN BEGIN
       print,'Power law deadtime distribution option with'
-      print,'- Power        :',float(pow)
-      print,'- Min deadtime :',float(min_d),' milisec'
-      print,'- Max deadtime :',float(max_d),' milisec'
-      print,'- Step size    :',float(step),' milisec'
+      print,'- 2.5 ms const. :',float((1-ratio)*xuld_r),' cts/s'
+      print,'- Dist. count   :',float(ratio*xuld_r),' cts/s'
+      print,'- Power         :',float(pow)
+      print,'- Min deadtime  :',float(min_d),' milisec'
+      print,'- Max deadtime  :',float(max_d),' milisec'
+      print,'- Step size     :',float(step),' milisec'
    ENDIF
 ENDIF ELSE BEGIN
    message,'Choose whether constant or power law deadtime'
 ENDELSE
-
-;DefSysV, '!RNG', Obj_New('RandomNumberGenerator')
 
 FOR k=0,ndet DO BEGIN
    
@@ -115,7 +117,7 @@ FOR k=0,ndet DO BEGIN
             IF xuld_lc[i] GT 0 THEN BEGIN
                IF dead_step LT tot_step-i THEN BEGIN
                   olc[i+1:i+dead_step]=0
-                  ;unparalyzed case ignore the ones already inside the deadtime
+                  ;paralyzed case ignore the ones already inside the deadtime
                   i=i+dead_step
                   ;if deadtime is lower than the rest of the ligth curve
                   ;make the rest 0 then break
@@ -136,7 +138,8 @@ FOR k=0,ndet DO BEGIN
          xulddist, pow, min_d, max_d, step, dist
          steps=size(dist)
          steps=steps[2]
-         n_rand=randomu(systime(1),tot_step)
+         n_rand=rand->GetRandomNumbers(tot_step,/double)
+         rat_rand=rand->GetRandomNumbers(tot_step,/double)
          cnt=0
          
          FOR i=0,tot_step-1 DO BEGIN
@@ -146,16 +149,21 @@ FOR k=0,ndet DO BEGIN
             ;calculate dead time for each xuld photon
                cnt=cnt+1
                dead_step=0
-               FOR j=0,steps-1 DO BEGIN
-                  IF dist[1,j] GT n_rand[cnt] THEN BEGIN
-                     dead_step=floor(dist[0,j]*1e3/dt)
-                     BREAK
-                  ENDIF
-                  IF j EQ steps-1 THEN BEGIN
-                     dead_step=floor(dist[0,steps-1]*1e3/dt)
-                  ENDIF
-               ENDFOR
-               
+
+               IF rat_rand[i] GT ratio THEN BEGIN
+                  dead_step=floor(2.5*1e3/dt)
+               ENDIF ELSE BEGIN
+                  FOR j=0,steps-1 DO BEGIN
+                     IF dist[1,j] GT n_rand[cnt] THEN BEGIN
+                        dead_step=floor(dist[0,j]*1e3/dt)
+                        BREAK
+                     ENDIF
+                     IF j EQ steps-1 THEN BEGIN
+                        dead_step=floor(dist[0,steps-1]*1e3/dt)
+                     ENDIF
+                  ENDFOR
+               ENDELSE
+
                IF dead_step LT tot_step-i THEN BEGIN
                   olc[i+1:i+dead_step]=0
                   cnt=cnt+total(xuld_lc[i:i+dead_step])-1
