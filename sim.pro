@@ -5,6 +5,7 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
          pow=vpow,ratio=vratio,min_d=vmin_d,max_d=vmax_d,step=vstep,$
          ndet=vndet,$
          logf=vlogf, high=vhigh,$
+         stat=vstat,$
          chatty=chatty 
   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -36,6 +37,8 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
 ;
 ;   - For power law distributed cosmic background
 ;   3 :  pow       Power of the power law distribution
+;     :  ratio     * ratio*xuld_r for log distributed background
+;                  * (1-ratio)*xuld_r for 2.5 ms constant deadtime
 ;     :  min_d     Minimum deadtime
 ;     :  max_d     Maximum deadtime
 ;     :  step      Step size to calculate distribution
@@ -47,6 +50,12 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
 ; OUTPUT
 ;   - freq     Frequence array
 ;   - psd      Binned PSD function
+;
+; OPTIONAL OUTPUT
+;   - (v)stat   two dimensional array notes the dead time of xuld particles     
+;               * first array for all created particles
+;               * second array excludes the particles which are
+;               already created in the paralyzed time
 ;
 ; PROCEDURES
 ;   - observe1.pro
@@ -109,19 +118,24 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
                dead=dead,$
                pow=pow,ratio=ratio,min_d=min_d,max_d=max_d,step=step,$
                ndet=ndet,$
+               stat=vstat,$
                chatty=0
     
      IF i EQ 0 THEN BEGIN
         psd_t=psd
         meanlc=mean(rblc)
+        stat=vstat
      ENDIF ELSE BEGIN
         psd_t=(psd_t*i+psd)/(i+1)
         meanlc=(meanlc*i+mean(rblc))/(i+1)
+        stat=stat+vstat
      ENDELSE
 
      progressbar,i,times,start,2L
 
   ENDFOR
+
+  vstat=stat
 
   psd_t=psd_t[1:floor(n_elements(psd)*0.5)+1]
   length=floor(n_elements(psd)*0.5)

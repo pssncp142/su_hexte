@@ -3,6 +3,7 @@ PRO observe1, back_r, xuld_r, dur, dt, f_dt, rand, rblc, psd, $
               dead=vdead,$
               pow=vpow,ratio=vratio,min_d=vmin_d,max_d=vmax_d,step=vstep,$
               ndet=vndet,$
+              stat=vstat,$
               chatty=chatty 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -31,6 +32,8 @@ PRO observe1, back_r, xuld_r, dur, dt, f_dt, rand, rblc, psd, $
 ;
 ;   - For power law distributed cosmic background
 ;   3 :  pow       power of the power law distribution
+;     :  ratio     * ratio*xuld_r for log distributed background
+;                  * (1-ratio)*xuld_r for 2.5 ms constant deadtime
 ;     :  min_d     minimum deadtime
 ;     :  max_d     maximum deadtime
 ;     :  step      step size to calculate distribution
@@ -40,8 +43,11 @@ PRO observe1, back_r, xuld_r, dur, dt, f_dt, rand, rblc, psd, $
 ;   - perc      percentage between observed light curve 
 ;               and pure poisson light curve
 ;
-; NOTES
-;   - ??
+; OPTIONAL OUTPUT
+;   - (v)stat   two dimensional array notes the dead time of xuld particles     
+;               * first array for all created particles
+;               * second array excludes the particles which are
+;               already created in the paralyzed time
 ;
 ; PROCEDURES
 ;   - poissonlc.pro
@@ -95,6 +101,8 @@ ENDIF ELSE BEGIN
    message,'Choose whether constant or power law deadtime'
 ENDELSE
 
+stat=lonarr(2,floor((max_d-min_d)/step))
+
 FOR k=0,ndet DO BEGIN
    
    IF p_pure EQ 1 THEN BEGIN
@@ -142,6 +150,23 @@ FOR k=0,ndet DO BEGIN
          rat_rand=rand->GetRandomNumbers(tot_step,/double)
          cnt=0
          
+         ;;;;;;;;;;;;;;;;;;;;;;;;;;
+         FOR i=0,tot_step-1 DO BEGIN
+            IF xuld_lc[i] GT 0 THEN BEGIN
+               IF rat_rand[i] GT ratio THEN BEGIN
+                  stat[0,0]=stat[0,0]+1L
+               ENDIF ELSE BEGIN
+                  FOR j=0,steps-1 DO BEGIN
+                     IF dist[1,j] GT n_rand[i] THEN BEGIN
+                        stat[0,j]=stat[0,j]+1L
+                        BREAK
+                     ENDIF
+                  ENDFOR
+               ENDELSE
+            ENDIF
+         ENDFOR
+         ;;;;;;;;;;;;;;;;;;;;;;;;;;
+
          FOR i=0,tot_step-1 DO BEGIN
             
             IF xuld_lc[i] GT 0 THEN BEGIN
@@ -152,14 +177,17 @@ FOR k=0,ndet DO BEGIN
 
                IF rat_rand[i] GT ratio THEN BEGIN
                   dead_step=floor(2.5*1e3/dt)
+                  stat[1,0]=stat[1,0]+1L
                ENDIF ELSE BEGIN
                   FOR j=0,steps-1 DO BEGIN
                      IF dist[1,j] GT n_rand[cnt] THEN BEGIN
                         dead_step=floor(dist[0,j]*1e3/dt)
+                        stat[1,j]=stat[1,j]+1L
                         BREAK
                      ENDIF
                      IF j EQ steps-1 THEN BEGIN
                         dead_step=floor(dist[0,steps-1]*1e3/dt)
+                        stat[1,j]=stat[1,j]+1L
                      ENDIF
                   ENDFOR
                ENDELSE
@@ -192,6 +220,7 @@ FOR k=0,ndet DO BEGIN
 
 ENDFOR
 
+vstat=stat
 rebinlc, olc1, dur, dt, f_dt, rblc
 psdcalc, rblc, dur, psd
 
