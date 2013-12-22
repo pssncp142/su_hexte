@@ -1,4 +1,23 @@
 FUNCTION modelf,A,B,f
+  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Yigit Dallilar    22.12.2013
+;
+; Function for dead time modelling
+;
+; FUNCTION
+;   -  Ai*sin(!pi*Bi*f)^/(!pi*f)^2
+;
+; INPUT 
+;   - A         amplitude array given inside the function
+;   - B         dead time array given inside the function
+;   - f         discrete frequency
+;
+; OUTPUT
+;   Result for only deadtime or combination of both dead time and
+;   amplitudes
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   size=size(B)
   size_A=size(A)
@@ -17,3 +36,4 @@ FUNCTION modelf,A,B,f
   ENDELSE
 
 END
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

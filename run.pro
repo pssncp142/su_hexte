@@ -8,13 +8,13 @@ f_dt=0.5^9D0
 times=5000
 ndet=1
 ;pure=1
-;dead=2.5
+dead=2.5
 
-ratio=0.1
-pow=-1.72
-min_d=2.5
-max_d=50.5
-step=0.2
+;ratio=0.1
+;pow=-1.72
+;min_d=2.5
+;max_d=50.5
+;step=0.2
 
 sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, nsig, $
          pure=pure,$
