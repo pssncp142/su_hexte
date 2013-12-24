@@ -75,6 +75,7 @@ IF keyword_set(pure) THEN BEGIN
 ENDIF ELSE IF keyword_set(vdead) THEN BEGIN 
    p_pure=0
    opt=1
+   stat=lonarr(2)
    dead=vdead 
    IF chatty EQ 1 THEN print,'Constant deadtime option with',$
                              float(dead),' milisec'
@@ -88,6 +89,7 @@ ENDIF ELSE IF keyword_set(vpow) AND keyword_set(vmin_d) AND $
    min_d=vmin_d
    max_d=vmax_d
    step=vstep
+   stat=lonarr(2,floor((max_d-min_d)/step))
    IF chatty EQ 1 THEN BEGIN
       print,'Power law deadtime distribution option with'
       print,'- 2.5 ms const. :',float((1-ratio)*xuld_r),' cts/s'
@@ -100,8 +102,6 @@ ENDIF ELSE IF keyword_set(vpow) AND keyword_set(vmin_d) AND $
 ENDIF ELSE BEGIN
    message,'Choose whether constant or power law deadtime'
 ENDELSE
-
-stat=lonarr(2,floor((max_d-min_d)/step))
 
 FOR k=0,ndet DO BEGIN
    
@@ -120,9 +120,14 @@ FOR k=0,ndet DO BEGIN
       IF opt EQ 1 THEN BEGIN
 
          dead_step=floor(dead*1e3/dt)
-         FOR i=0,tot_step-1 DO BEGIN
          
+         FOR i=0,tot_step-1 DO BEGIN
+            IF xuld_lc[i] GT 0 THEN stat[0]=stat[0]+1L
+         ENDFOR
+
+         FOR i=0,tot_step-1 DO BEGIN
             IF xuld_lc[i] GT 0 THEN BEGIN
+               stat[1]=stat[1]+1L
                IF dead_step LT tot_step-i THEN BEGIN
                   olc[i+1:i+dead_step]=0
                   ;paralyzed case ignore the ones already inside the deadtime
