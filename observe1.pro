@@ -71,6 +71,7 @@ ENDELSE
 
 IF keyword_set(pure) THEN BEGIN
    p_pure=1
+   stat=1
    IF chatty EQ 1 THEN print,'Pure poisson light curve.'
 ENDIF ELSE IF keyword_set(vdead) THEN BEGIN 
    p_pure=0
@@ -225,7 +226,7 @@ FOR k=0,ndet DO BEGIN
 
 ENDFOR
 
-vstat=stat
+IF p_pure NE 1 THEN vstat=stat
 rebinlc, olc1, dur, dt, f_dt, rblc
 psdcalc, rblc, dur, psd
 

@@ -74,6 +74,7 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
 
   IF keyword_set(vpure) THEN BEGIN
      pure=vpure
+     vstat=0
      print,'Pure poisson curve...'
   ENDIF ELSE pure=0
   IF keyword_set(vdead) THEN BEGIN
@@ -124,18 +125,18 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
      IF i EQ 0 THEN BEGIN
         psd_t=psd
         meanlc=mean(rblc)
-        stat=vstat
+        IF pure EQ 0 THEN stat=vstat
      ENDIF ELSE BEGIN
         psd_t=(psd_t*i+psd)/(i+1)
         meanlc=(meanlc*i+mean(rblc))/(i+1)
-        stat=stat+vstat
+        IF pure EQ 0 THEN stat=stat+vstat
      ENDELSE
 
      progressbar,i,times,start,2L
 
   ENDFOR
 
-  vstat=stat
+  IF pure EQ 0 THEN vstat=stat
 
   psd_t=psd_t[1:floor(n_elements(psd)*0.5)+1]
   length=floor(n_elements(psd)*0.5)
@@ -146,7 +147,7 @@ PRO sim, back_r, xuld_r, dur, dt, f_dt, times, freq, psd, $
   print,'Final Rate   : ',float(meanlc),' cts/sec'
   print,'Efficiency   : ',float(meanlc/back_r*100),'%'
 
-  freqrebin,f,psd_t,freq,psd,nsig,osig,logf=0.12,high=128D0
+  freqrebin,f,psd_t,freq,psd,nsig,osig,logf=0.1,high=128D0
 
 END
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
