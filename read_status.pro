@@ -34,18 +34,6 @@ filt_f=f_path+id_spl[2]+'.00ha_filter.xfl'
 gti_f=f_path+id_spl[2]+'.00ha_good_hexte.gti'
 hk_f=f_path+id_spl[2]+'.00ha_FH53_a.gz'
 
-time=loadcol(filt_f,'TIME')
-time_saa=loadcol(filt_f,'TIME_SINCE_SAA')
-earthlat=loadcol(filt_f,'ACSEARTHLAT')
-earthlon=loadcol(filt_f,'ACSEARTHLON')
-altitude=loadcol(filt_f,'ACSALTITUDE')
-mcilwain=loadcol(filt_f,'MCILWAIN_L')
-bkgd_theta=loadcol(filt_f,'BKGD_THETA')
-bkgd_phi=loadcol(filt_f,'BKGD_PHI')
-
-start=loadcol(gti_f,'START')
-stop=loadcol(gti_f,'STOP')
-
 data={time:loadcol(filt_f,'TIME'),$
       time_saa:loadcol(filt_f,'TIME_SINCE_SAA'),$
       earthlat:loadcol(filt_f,'ACSEARTHLAT'),$
@@ -56,6 +44,7 @@ data={time:loadcol(filt_f,'TIME'),$
       bkgd_phi:loadcol(filt_f,'BKGD_PHI'),$
       start:loadcol(gti_f,'START'),$
       stop:loadcol(gti_f,'STOP'),$
+      time2:loadcol(hk_f,'TIME'),$
       uldd0:loadcol(hk_f,'ctUldD0'),$
       xuldd0:loadcol(hk_f,'ctXuldD0'),$
       uldd1:loadcol(hk_f,'ctUldD1'),$
