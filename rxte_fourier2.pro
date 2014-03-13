@@ -3,7 +3,7 @@ PRO rxte_fourier2,path,type=type, $
                  schlittgen=schlittgen,leahy=leahy,miyamoto=miyamoto, $
                  hexte_bkg=hexte_bkg,back_leahy=back_leahy,pca_bkg=pca_bkg, $
                  linf=linf,logf=logf,nof=nof, $
-                 zhang_dt=zhang_dt, $
+                 zhang_dt=zhang_dt, back_corr=back_corr, $
                  ninstr=ninstr,deadtime=deadtime, $
                  nonparalyzable=nonparalyzable, $
                  pca_dt=pca_dt, $ 
@@ -178,6 +178,10 @@ PRO rxte_fourier2,path,type=type, $
 ;              ebounds        : energy ranges, needed for reading the 
 ;                               PCA background, see also
 ;                               plotting keywords ``kw6''
+;
+;              back_leahy     : reads background light curve performs the same
+;                               operations as usual. (Make sure you give the 
+;                               dimensions accordingly. 28s data collection per rocking.)
 ;   
 ;       -- for the frequency rebinning (kw2)
 ;              linf           : parameter giving the number of
@@ -250,6 +254,10 @@ PRO rxte_fourier2,path,type=type, $
 ;              only one of the  keywords zhang_dt/pca_dt/hexte_dt can
 ;              be set;  
 ;              default: zhang_dt=1, pca_dt undefined, hexte_dt undefined
+;
+;               back_corr     : New option. Deadtime correction is performed 
+;                               over background light curves. It is valid 
+;                               for hexte data
 ;   
 ;       -- for the determination of the rms for each psd (kw4)    
 ;              fmin           : minimum frequency in Hz;
@@ -513,11 +521,16 @@ PRO rxte_fourier2,path,type=type, $
 ;                                  keywords pcurate and clusterrate
 ;                                  have been removed (see foucalc) 
 ;
-;	   Version 1.14, 2001/10/04 Emrah Kalemci
-;				   now it includes dead-time correction
-;				   for HEXTE cluster B. Minor modifications
-;			           are done to foucalc.pro, readxuld.pro,
-;      				   psdcorr_hexte.pro also
+;	         Version 1.14, 2001/10/04 Emrah Kalemci
+;				                           now it includes dead-time correction
+;				                           for HEXTE cluster B. Minor modifications
+;			                             are done to foucalc.pro, readxuld.pro,
+;      				                     psdcorr_hexte.pro also
+;             
+;          Modifications for a project in Sabanci University
+;          Version 2.01, 2014/02/19 Yigit Dallilar
+;                                  back_leahy option is added. See keyword
+;                                  instructions for more information
 ;   
 ;-   
    
@@ -584,10 +597,12 @@ IF ((nlin+nlog) EQ 0) THEN logf=0.15
 nzha = n_elements(zhang_dt)
 npca = n_elements(pca_dt)
 nhex = n_elements(hexte_dt)
-IF ((nzha+npca+nhex) GT 1) THEN BEGIN  
+nback = n_elements(back_corr)
+
+IF ((nzha+npca+nhex+nback) GT 1) THEN BEGIN  
     message,'rxte_fourier: Only one deadtime-type-keyword can be set' 
 ENDIF
-IF ((nzha+npca+nhex) EQ 0) THEN zhang_dt=1 
+IF ((nzha+npca+nhex+nback) EQ 0) THEN zhang_dt=1 
 IF (keyword_set(zhang_dt)) THEN BEGIN 
     IF (n_elements(ninstr) EQ 0) THEN ninstr=5    
     IF (n_elements(deadtime) EQ 0) THEN deadtime=1D-5    
@@ -657,11 +672,33 @@ maxdim      = long(inpmaxdim)
 dim         = long(inpdim)
 ndim        = n_elements(dim)
 
+;; Yigit Dallilar 02.2014
+;; Little change!!! if back_leahy option is enabled reads the background light curve
+;; and extracts its power spectrum. Otherwise, it works as usual.
 IF keyword_set(back_leahy) THEN BEGIN
 segname     = path+'/light/processed/'+string(format='(I7.7)',maxdim)+'_seg_bkg.xdrlc'
 ENDIF ELSE BEGIN
 segname     = path+'/light/processed/'+string(format='(I7.7)',maxdim)+'_seg.xdrlc'
 ENDELSE
+
+IF keyword_set(back_corr) THEN BEGIN
+  sync_back,path
+  rxte_fourier2,path,type=type, $
+                maxdim=512L*28L,dim=512L*28L,normindiv=1,$
+                leahy=1, back_leahy=1, $
+                linf=linf,logf=logf,nof=nof, $
+                hexte_dt=0, $
+                fmin=fmin,fmax=fmax,fcut=fcut, $
+                xmin=plotxmin,xmax=plotxmax, $
+                ymin=plotymin,ymax=plotymax, $
+                xtenlog=plotxtenlog,ytenlog=plotytenlog,sym=plotsym, $
+                ebounds=ebounds,obsid=obsid,username=username,date=date, $
+                color=plotcolor,postscript=postscript,chatty=chatty
+  backpath=path+'/light/fourier/high/onelength/'
+  xdrfu_r1,backpath+'0014336_rebin_signormpsd.xdrfu',back_f,back_psd
+  xdrfu_r1,backpath+'0014336_rebin_errnormpsd.xdrfu',back_f,back_err  
+  back_fit2, path, back_f
+ENDIF
 
 fouroot     = path+'/light/fourier/'+type
 
@@ -752,7 +789,7 @@ IF (keyword_set(pca_dt)) THEN BEGIN
 ENDIF
 
 ;; read HEXTE background for psd normalization
-IF (keyword_set(hexte_bkg)) THEN BEGIN
+IF (keyword_set(hexte_bkg) or keyword_set(back_corr)) THEN BEGIN
     backfile=path+'/light/processed/'+string(format='(I7.7)',maxdim)+ $
       '_seg_b*.xdrlc'
     xdrlc_r,backfile,ti,bkg,chatty=chatty
@@ -812,10 +849,11 @@ ENDIF
 ;; save results
 FOR i=0,ndim-1 DO BEGIN
     foupath=fouroot+'/onelength/'+string(format='(I7.7)',dim(i))+'_rebin'
-    foucalc,time,rate,foupath, $
+    foucalc2,time,rate,foupath, $
       dseg=dim(i),normindiv=normindiv, $
       schlittgen=schlittgen,leahy=leahy,miyamoto=miyamoto, $
       avg_bkg=avg_bkg, $ 
+      back_corr=back_corr, back_f=back_f, back_psd=back_psd, back_err=back_err, $ 
       linf=linf,logf=logf, $
       zhang_dt=zhang_dt, $
       ninstr=ninstr,deadtime=deadtime,nonparalyzable=nonparalyzable, $ 
