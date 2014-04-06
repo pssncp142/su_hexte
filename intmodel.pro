@@ -20,6 +20,6 @@ ENDFOR
 
 ;plot,f,2+psd,/xlog,yr=[1.9,2.4]
 
-RETURN,psd
+RETURN, psd
 
 END
