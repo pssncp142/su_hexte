@@ -1,6 +1,6 @@
 FUNCTION func, t, a, b, c, f
 
-  RETURN, -1e5*c*(t*1e3+b)^(-a)*sin(!pi*t*f)^2/(!pi*f)^2
+  RETURN, 1e5*c*((t*1e3)*160/6.+50)^(-a)*sin(!pi*t*f)^2/(!pi*f)^2
 
 END
 

@@ -47,13 +47,6 @@ PRO four, path
 
 END
 
-lon = indgen(12)*30
-ndx = ['-1','-2']
-
-FOREACH l, lon DO BEGIN
-;spawn,'du -kh arch/'+strtrim(l+30,1)+'-'+strtrim(l,1)+x+$
-;      '/light/processed/*'
-   four,'arch1/'+strtrim(l+30,1)+'-'+strtrim(l,1)
-ENDFOREACH
+   four,'arch1/all'
 
 END

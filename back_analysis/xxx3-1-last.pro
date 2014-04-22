@@ -9,7 +9,7 @@ PRO four, path
   back_leahy          = 1
 ;hexte_bkg           = 0
   nof                 = 1
-  logf                = 0.05
+  logf                = 0.15
   hexte_dt            = 0
 ;ninstr              = numpcu
 ;deadtime            = 1D-5
@@ -47,13 +47,16 @@ PRO four, path
 
 END
 
-lon = indgen(12)*30
-ndx = ['-1','-2']
+;lon = indgen(12)*30
+;ndx = ['-1','-2']
 
-FOREACH l, lon DO BEGIN
-;spawn,'du -kh arch/'+strtrim(l+30,1)+'-'+strtrim(l,1)+x+$
-;      '/light/processed/*'
-   four,'arch1/'+strtrim(l+30,1)+'-'+strtrim(l,1)
-ENDFOREACH
+;FOREACH x, ndx DO BEGIN
+;   FOREACH l, lon DO BEGIN
+      ;spawn,'du -kh arch/'+strtrim(l+30,1)+'-'+strtrim(l,1)+x+$
+      ;      '/light/processed/*'
+      ;print,strtrim(l+30,1)+'-'+strtrim(l,1)+x
+      four,'arch/360-330-2/'
+;   ENDFOREACH
+;ENDFOREACH
 
 END
