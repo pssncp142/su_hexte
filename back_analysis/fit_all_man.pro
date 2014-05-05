@@ -60,7 +60,7 @@ FOR i=0, n_elements(lon)-1 DO BEGIN
    ENDFOR
 ENDFOR
 
-openw, 1, 'fit_res_man.txt'
+openw, 1, 'fit_res_man1.txt'
 FOR j=0, n_elements(a)-1 DO BEGIN
    FOR i=0, n_elements(lon)-1 DO BEGIN
       printf, 1, fit_r[i, j, 1], fit_r[i, j, 3], fit_r[i, j, 5], $

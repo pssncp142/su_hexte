@@ -46,7 +46,6 @@ fit_r = fltarr(2, n_elements(lon), n_elements(a), 7)
 FOR k=0, n_elements(ndx)-1 DO BEGIN
    FOR i=0, n_elements(lon)-1 DO BEGIN
       FOR j=0, n_elements(a)-1 DO BEGIN
-         print,lon[i]+ndx[k]
          IF lon[i]+ndx[k] NE exc[0] THEN BEGIN
             xdrfu_r1, lon[i]+ndx[k]+f_path+$
                       '0014336_manbin_signormpsd.xdrfu.gz', f, psd
@@ -55,12 +54,13 @@ FOR k=0, n_elements(ndx)-1 DO BEGIN
             fit_r[k, i, j, *] = fit(f, psd, err, a[j])
             device,decomposed=0
             loadct,1
-            tt = findgen(250)
+            tt = findgen(256)
             plot,tt,all(tt,fit_r[k,i,j,*]),/xlog,xr=[1,1e3],yr=[1.95,2.15],$
                  back=255,color=0,thick=2
             oploterror,f,psd,err,psym=3,/nohat,errthick=2,$
                        color=100,backcolor=255,linecolor=100,errcolor=100
-            tt=findgen(256)       
+            print,lon[i]+ndx[k]
+            stop      
          ENDIF
       ENDFOR
    ENDFOR
