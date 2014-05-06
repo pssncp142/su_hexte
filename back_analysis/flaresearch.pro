@@ -1,4 +1,28 @@
 
+PRO ndxflare2, r, ndx
+
+  len = 512L*28L
+  ndx = []
+
+  FOR i=0, n_elements(r)/len-1 DO BEGIN
+     m_lc = mean(r[i*len:(i+1)*len-1])
+     rebin, r[i*len:(i+1)*len-1], n_r
+     FOR j=0, 27 DO BEGIN
+        IF n_r[j] GT m_lc*1.4 THEN BEGIN
+          ndx = [ndx,i] 
+          ;print,'in', i
+          ;plot, n_r, yr=[0,100]
+          ;stop
+          BREAK
+        ENDIF
+     ENDFOR
+     ;print, 'out', i
+     ;plot, n_r, yr=[0,100]
+     ;stop
+  ENDFOR
+
+END
+
 PRO ndxflare, t, r, ndx
 
   m_lc = mean(r)
@@ -52,7 +76,7 @@ PRO rebin, r, n_r
   
   n_r=[]
 
-  sec = 4L
+  sec = 1L
 
   FOR i=0L, n_elements(r)/(512*sec)-1 DO BEGIN
      n_r = [n_r,mean(r[i*512L*sec:(i+1)*512L*sec-1])]
@@ -81,19 +105,31 @@ PRO rebint, r, n_t, n_r
 
 END
 
+;xdrlc_r,'120-90/light/processed/0014336_seg_bkg.xdrlc.gz',t,r
+;ndxflare2, r[*,0], ndx
+;print, n_elements(ndx)
 
-xdrlc_r,'120-90/light/processed/0014336_seg_bkg.xdrlc.gz',t,r
+l = indgen(12)*30
 
-print,'ndxflare'
-ndxflare, t, r[*,0], ndx
-print,'removeflare'
-removeflare, r[*,0], ndx, n_t, n_r 
+FOR i=0, n_elements(l)-1 DO BEGIN
+   strlon = strtrim(l[i]+30,1)+'-'+strtrim(l[i],1)
+   print,strlon
+   xdrlc_r,strlon+'/light/processed/0014336_seg_bkg.xdrlc.gz',t,r
+   ndxflare2, r[*,0], ndx
+   removeflare, r[*,0], ndx, n_t, n_r 
+   rr = fltarr(n_elements(n_r),2)
+   rr[*,0] = n_r
+   rr[*,1] = n_r
+   xdrlc_w,'../arch2/'+strlon+'/light/processed/0014336_seg_bkg.xdrlc',n_t,rr
+ENDFOR
+
 
 ;rebin, t, r[*,0], n_t, n_r
-
 ;help, n_t, n_r
 ;print, mean(n_r)
-rebint, n_r, n_t, a_r
-plot, n_t, a_r,psym=3,yr=[0,100]
-stop
+;rebint, n_r, n_t, a_r
+;rebint, r[*,0], n_t, a_r
+;plot, n_t, a_r,psym=3,yr=[0,100]
+;stop
+
 END

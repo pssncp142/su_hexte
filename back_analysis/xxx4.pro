@@ -3,7 +3,7 @@ PRO manbin, lon
 fbin=[0,3,10,20,30,40,50,60,70,80,90,100,$
       110,120,130,140,160,180,200,220,250]
 
-path='arch1/'+lon+'/light/fourier/high/onelength/'
+path='arch2/'+lon+'/light/fourier/high/onelength/'
 
 xdrfu_r1,path+'0014336_signormpsd.xdrfu.gz',f,psd
 xdrfu_r1,path+'0014336_errnormpsd.xdrfu.gz',f,err
