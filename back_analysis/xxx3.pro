@@ -47,7 +47,7 @@ PRO four, path
 
 END
 
-path = 'arch2'
+path = 'arch4'
 lon = indgen(12)*30
 ;ndx = ['-1','-2']
 

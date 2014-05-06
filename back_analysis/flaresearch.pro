@@ -116,11 +116,12 @@ FOR i=0, n_elements(l)-1 DO BEGIN
    print,strlon
    xdrlc_r,strlon+'/light/processed/0014336_seg_bkg.xdrlc.gz',t,r
    ndxflare2, r[*,0], ndx
+   print, n_elements(ndx), n_elements(r[*,0])/(512*28)
    removeflare, r[*,0], ndx, n_t, n_r 
    rr = fltarr(n_elements(n_r),2)
    rr[*,0] = n_r
    rr[*,1] = n_r
-   xdrlc_w,'../arch2/'+strlon+'/light/processed/0014336_seg_bkg.xdrlc',n_t,rr
+   xdrlc_w,'../arch4/'+strlon+'/light/processed/0014336_seg_bkg.xdrlc',n_t,rr
 ENDFOR
 
 
