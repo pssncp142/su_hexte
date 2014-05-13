@@ -191,10 +191,10 @@ FOR k=0,ndet DO BEGIN
                         stat[1,j]=stat[1,j]+1L
                         BREAK
                      ENDIF
-                     IF j EQ steps-1 THEN BEGIN
-                        dead_step=floor(dist[0,steps-1]*1e3/dt)
-                        stat[1,j]=stat[1,j]+1L
-                     ENDIF
+                     ;IF j EQ steps-1 THEN BEGIN
+                     ;   dead_step=floor(dist[0,steps-1]*1e3/dt)
+                     ;   stat[1,j]=stat[1,j]+1L
+                     ;ENDIF
                   ENDFOR
                ENDELSE
 
